@@ -60,3 +60,6 @@ Temporary Items
 *.macro
 saved_macros/
 MacroRecorder.app/
+*.dmg
+dmg_staging/
+dmg_temp/
