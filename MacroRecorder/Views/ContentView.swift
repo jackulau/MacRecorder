@@ -16,9 +16,9 @@ struct ContentView: View {
     @State private var showingSaveDialog = false
     @State private var macroName = ""
     @State private var showingImportExport = false
-    // @State private var statusOverlayWindow: StatusOverlayWindow?
+    @State private var statusOverlayWindow: StatusOverlayWindow?
 
-    // @AppStorage("showStatusOverlay") private var showStatusOverlay: Bool = true
+    @AppStorage("showStatusOverlay") private var showStatusOverlay: Bool = true
 
     var body: some View {
         HSplitView {
@@ -94,7 +94,7 @@ struct ContentView: View {
         }
         .onAppear {
             setupHotkeys()
-            // setupOverlayWindow()
+            setupOverlayWindow()
         }
         .onReceive(NotificationCenter.default.publisher(for: .hotkeysChanged)) { _ in
             hotkeyManager.reloadHotkeys()
@@ -104,34 +104,34 @@ struct ContentView: View {
                 playback: hotkeyManager.playbackHotkey
             )
         }
-        // .onChange(of: session.isRecording) { isRecording in
-        //     updateOverlayVisibility()
-        // }
-        // .onChange(of: session.isPlaying) { isPlaying in
-        //     updateOverlayVisibility()
-        // }
-        // .onChange(of: showStatusOverlay) { _ in
-        //     updateOverlayVisibility()
-        // }
-        // .onChange(of: UserDefaults.standard.string(forKey: "overlayPosition")) { _ in
-        //     statusOverlayWindow?.positionWindow()
-        // }
+        .onChange(of: session.isRecording) { isRecording in
+            updateOverlayVisibility()
+        }
+        .onChange(of: session.isPlaying) { isPlaying in
+            updateOverlayVisibility()
+        }
+        .onChange(of: showStatusOverlay) { _ in
+            updateOverlayVisibility()
+        }
+        .onChange(of: UserDefaults.standard.string(forKey: "overlayPosition")) { _ in
+            statusOverlayWindow?.positionWindow()
+        }
     }
 
-    // private func setupOverlayWindow() {
-    //     statusOverlayWindow = StatusOverlayWindow(session: session, player: session.player)
-    //     updateOverlayVisibility()
-    // }
+    private func setupOverlayWindow() {
+        statusOverlayWindow = StatusOverlayWindow(session: session, player: session.player)
+        updateOverlayVisibility()
+    }
 
-    // private func updateOverlayVisibility() {
-    //     guard let window = statusOverlayWindow else { return }
+    private func updateOverlayVisibility() {
+        guard let window = statusOverlayWindow else { return }
 
-    //     if showStatusOverlay && (session.isRecording || session.isPlaying) {
-    //         window.showOverlay()
-    //     } else {
-    //         window.hideOverlay()
-    //     }
-    // }
+        if showStatusOverlay && (session.isRecording || session.isPlaying) {
+            window.showOverlay()
+        } else {
+            window.hideOverlay()
+        }
+    }
 
     private func setupHotkeys() {
         // Pass hotkeys to session so recorder can filter them out

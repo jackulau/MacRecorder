@@ -21,6 +21,7 @@
 		012 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		013 /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		014 /* KeybindCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeybindCaptureView.swift; sourceTree = "<group>"; };
+		017 /* StatusOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusOverlayView.swift; sourceTree = "<group>"; };
 		015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		016 /* MacroRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacroRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -83,6 +84,7 @@
 				010 /* EventEditorView.swift */,
 				011 /* MacroListView.swift */,
 				012 /* StatusBarView.swift */,
+				017 /* StatusOverlayView.swift */,
 				013 /* PreferencesView.swift */,
 				014 /* KeybindCaptureView.swift */,
 			);
@@ -162,6 +164,7 @@
 		510 /* EventEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010 /* EventEditorView.swift */; };
 		511 /* MacroListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011 /* MacroListView.swift */; };
 		512 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012 /* StatusBarView.swift */; };
+		514 /* StatusOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017 /* StatusOverlayView.swift */; };
 		513 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 013 /* PreferencesView.swift */; };
 /* End PBXBuildFile section */
 
@@ -182,6 +185,7 @@
 				510 /* EventEditorView.swift in Sources */,
 				511 /* MacroListView.swift in Sources */,
 				512 /* StatusBarView.swift in Sources */,
+				514 /* StatusOverlayView.swift in Sources */,
 				513 /* PreferencesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

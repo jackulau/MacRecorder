@@ -5,7 +5,7 @@
 
 APP_NAME="MacroRecorder"
 APP_BUNDLE="build/${APP_NAME}.app"
-DMG_NAME="${APP_NAME}-v1.0.1"
+DMG_NAME="${APP_NAME}-v1.0.3"
 VOLUME_NAME="${APP_NAME}"
 DMG_TEMP="${DMG_NAME}-temp.dmg"
 DMG_FINAL="${DMG_NAME}.dmg"
