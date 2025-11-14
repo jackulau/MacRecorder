@@ -44,7 +44,7 @@ struct ControlsView: View {
                         Text("Clear")
                     }
                 }
-                .disabled(session.isRecording || session.currentMacro?.events.isEmpty != false)
+                .disabled(session.isRecording || session.currentMacro?.events.isEmpty ?? true)
 
                 Spacer()
 

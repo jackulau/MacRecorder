@@ -11,8 +11,10 @@ struct EventListView: View {
     @ObservedObject var session: MacroSession
     let currentEventIndex: Int
 
-    @State private var selectedEvent: MacroEvent?
+    @State private var selectedEvents: Set<UUID> = []
+    @State private var lastSelectedIndex: Int?
     @State private var showingEventEditor = false
+    @State private var editingEvent: MacroEvent?
     @State private var showingEventCreator = false
     @State private var draggedEventIndex: Int?
 
@@ -31,8 +33,15 @@ struct EventListView: View {
 
             // Event list header
             HStack {
-                Text("Event")
-                    .frame(width: 150, alignment: .leading)
+                if !selectedEvents.isEmpty {
+                    Text("\(selectedEvents.count) selected")
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                        .frame(width: 100, alignment: .leading)
+                } else {
+                    Text("Event")
+                        .frame(width: 100, alignment: .leading)
+                }
 
                 Text("Type")
                     .frame(width: 120, alignment: .leading)
@@ -44,6 +53,20 @@ struct EventListView: View {
                     .frame(width: 100, alignment: .leading)
 
                 Spacer()
+
+                if !selectedEvents.isEmpty {
+                    Button(action: {
+                        for eventId in selectedEvents {
+                            session.removeEvent(eventId: eventId)
+                        }
+                        selectedEvents.removeAll()
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Delete Selected Events")
+                }
 
                 Button(action: {
                     showingEventCreator = true
@@ -67,19 +90,20 @@ struct EventListView: View {
                     EventRow(
                         event: event,
                         index: index,
-                        isSelected: selectedEvent?.id == event.id,
+                        isSelected: selectedEvents.contains(event.id),
                         isCurrent: currentEventIndex == index && session.isPlaying,
                         onEdit: {
-                            selectedEvent = event
+                            editingEvent = event
                             showingEventEditor = true
                         },
                         onDelete: {
                             session.removeEvent(eventId: event.id)
+                            selectedEvents.remove(event.id)
                         }
                     )
                     .id(event.id)
-                    .onTapGesture {
-                        selectedEvent = event
+                    .onTapGesture(count: 1) { location in
+                        handleSelection(index: index, event: event, isShiftPressed: NSEvent.modifierFlags.contains(.shift))
                     }
                     .onDrag {
                         self.draggedEventIndex = index
@@ -101,7 +125,7 @@ struct EventListView: View {
             }
         }
         .sheet(isPresented: $showingEventEditor) {
-            if let event = selectedEvent {
+            if let event = editingEvent {
                 EventEditorView(
                     event: event,
                     onSave: { updatedEvent in
@@ -124,6 +148,34 @@ struct EventListView: View {
                     showingEventCreator = false
                 }
             )
+        }
+    }
+
+    private func handleSelection(index: Int, event: MacroEvent, isShiftPressed: Bool) {
+        if isShiftPressed, let lastIndex = lastSelectedIndex {
+            // Shift-click: select range
+            let startIndex = min(lastIndex, index)
+            let endIndex = max(lastIndex, index)
+
+            // Clear current selection and select range
+            selectedEvents.removeAll()
+            for i in startIndex...endIndex {
+                if i < macro.events.count {
+                    selectedEvents.insert(macro.events[i].id)
+                }
+            }
+        } else if NSEvent.modifierFlags.contains(.command) {
+            // Cmd-click: toggle selection
+            if selectedEvents.contains(event.id) {
+                selectedEvents.remove(event.id)
+            } else {
+                selectedEvents.insert(event.id)
+                lastSelectedIndex = index
+            }
+        } else {
+            // Regular click: single selection
+            selectedEvents = [event.id]
+            lastSelectedIndex = index
         }
     }
 }

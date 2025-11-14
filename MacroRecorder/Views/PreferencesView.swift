@@ -50,9 +50,28 @@ struct GeneralPreferencesView: View {
     @Binding var defaultPlaybackSpeed: Double
     @Binding var defaultPlaybackMode: String
     @Binding var showNotifications: Bool
+    // @AppStorage("showStatusOverlay") private var showStatusOverlay: Bool = true
+    // @AppStorage("overlayPosition") private var overlayPosition: String = "topRight"
 
     var body: some View {
         Form {
+            // Section("Status Overlay") {
+            //     Toggle("Show status overlay during recording/playback", isOn: $showStatusOverlay)
+
+            //     if showStatusOverlay {
+            //         Picker("Overlay Position", selection: $overlayPosition) {
+            //             Text("Top Left").tag("topLeft")
+            //             Text("Top Right").tag("topRight")
+            //             Text("Bottom Left").tag("bottomLeft")
+            //             Text("Bottom Right").tag("bottomRight")
+            //         }
+
+            //         Text("Displays recording status and playback loop count")
+            //             .font(.caption)
+            //             .foregroundColor(.secondary)
+            //     }
+            // }
+
             Section("Playback") {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Default Playback Speed")
@@ -250,7 +269,7 @@ struct AboutView: View {
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text("Version 1.0.1")
+            Text("Version 1.0.2")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 

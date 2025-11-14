@@ -18,9 +18,9 @@ class EventPlayer: ObservableObject {
     @Published var currentEventIndex: Int = 0
     @Published var playbackProgress: Double = 0.0
     @Published var currentLoop: Int = 0
+    @Published var mode: PlaybackMode = .once
 
     var playbackSpeed: Double = 1.0
-    var playbackMode: PlaybackMode = .once
 
     private var playbackTask: Task<Void, Never>?
     private var events: [MacroEvent] = []
@@ -29,7 +29,7 @@ class EventPlayer: ObservableObject {
         guard !isPlaying, !events.isEmpty else { return }
 
         self.events = events
-        self.playbackMode = mode
+        self.mode = mode
         self.playbackSpeed = speed
         self.currentEventIndex = 0
         self.currentLoop = 0
@@ -54,7 +54,7 @@ class EventPlayer: ObservableObject {
     }
 
     private func performPlayback() async {
-        switch playbackMode {
+        switch mode {
         case .once:
             await playOnce()
         case .count(let count):
