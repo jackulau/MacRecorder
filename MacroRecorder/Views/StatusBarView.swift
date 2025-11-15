@@ -49,17 +49,17 @@ struct StatusBarView: View {
             // Playback progress
             if session.isPlaying {
                 HStack(spacing: 5) {
-                    if case .count(let max) = session.player.mode {
-                        Text("Loop \(session.player.currentLoop)/\(max)")
+                    if case .count(let max) = session.eventPlayer.mode {
+                        Text("Loop \(session.eventPlayer.currentLoop)/\(max)")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                    } else if case .infinite = session.player.mode {
-                        Text("Loop \(session.player.currentLoop)")
+                    } else if case .infinite = session.eventPlayer.mode {
+                        Text("Loop \(session.eventPlayer.currentLoop)")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
 
-                    ProgressView(value: session.player.playbackProgress)
+                    ProgressView(value: session.eventPlayer.playbackProgress)
                         .frame(width: 100)
                 }
 

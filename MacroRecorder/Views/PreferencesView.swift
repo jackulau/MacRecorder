@@ -52,6 +52,7 @@ struct GeneralPreferencesView: View {
     @Binding var showNotifications: Bool
     @AppStorage("showStatusOverlay") private var showStatusOverlay: Bool = true
     @AppStorage("overlayPosition") private var overlayPosition: String = "topRight"
+    @AppStorage("useWindowScaling") private var useWindowScaling: Bool = false
 
     var body: some View {
         Form {
@@ -90,6 +91,15 @@ struct GeneralPreferencesView: View {
                     Text("Loop").tag("loop")
                     Text("Infinite").tag("infinite")
                 }
+
+                Divider()
+
+                Toggle("Use Window Scaling", isOn: $useWindowScaling)
+                    .help("Automatically scale mouse positions to window size during playback")
+
+                Text("When enabled, mouse positions will adapt to window size changes")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
 
             Section("Notifications") {

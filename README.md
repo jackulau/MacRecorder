@@ -1,8 +1,27 @@
-# MacroRecorder for macOS
+# MacroRecorder v1.0.3 for macOS
 
-A powerful, feature-rich macro recorder for macOS that allows you to record and playback mouse and keyboard events with precision and control.
+A powerful, professional-grade macro recorder for macOS that allows you to record and playback mouse and keyboard events with precision, window-specific recording, and advanced automation features.
 
 ## Features
+
+### ✨ New in v1.0.3
+
+- **Window-Specific Recording**
+  - Record events only within a specific window
+  - Window selection with live preview thumbnails
+  - Automatic window focus detection
+  - Window-relative coordinate tracking
+
+- **Ghost Actions**
+  - Send events to background windows without focusing
+  - Non-intrusive automation
+  - Perfect for multi-window workflows
+
+- **Advanced UI Features**
+  - Multi-selection with Shift+Click and Cmd+Click
+  - Status overlay showing recording/playback state
+  - Window preview on hover in picker
+  - Performance optimizations for 10,000+ events
 
 - **Comprehensive Event Recording**
   - Mouse clicks (left and right)
@@ -10,6 +29,7 @@ A powerful, feature-rich macro recorder for macOS that allows you to record and 
   - Keyboard key presses
   - Scroll wheel events
   - Precise position tracking
+  - Window focus events
 
 - **Flexible Playback**
   - Adjustable playback speed (0.1x to 5x)

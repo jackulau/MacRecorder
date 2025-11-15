@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.1</string>
+	<string>1.0.3</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>4</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>NSPrincipalClass</key>
@@ -28,6 +28,8 @@
 	<string>AppIcon</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2025. All rights reserved.</string>
+	<key>NSAccessibilityUsageDescription</key>
+	<string>MacroRecorder needs accessibility permissions to record and playback mouse and keyboard events. Please grant access in System Settings > Privacy and Security > Accessibility.</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>MacroRecorder needs access to control your computer to play back recorded macros.</string>
 	<key>NSAppleScriptEnabled</key>

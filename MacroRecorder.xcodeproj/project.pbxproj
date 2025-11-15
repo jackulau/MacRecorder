@@ -24,6 +24,9 @@
 		017 /* StatusOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusOverlayView.swift; sourceTree = "<group>"; };
 		015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		016 /* MacroRecorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacroRecorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F601 /* WindowDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WindowDetector.swift; path = MacroRecorder/Services/WindowDetector.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F603 /* WindowPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WindowPickerView.swift; path = MacroRecorder/Views/WindowPickerView.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5G601 /* CGEvent+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "CGEvent+Extensions.swift"; path = "MacroRecorder/Extensions/CGEvent+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -166,6 +169,9 @@
 		512 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012 /* StatusBarView.swift */; };
 		514 /* StatusOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017 /* StatusOverlayView.swift */; };
 		513 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 013 /* PreferencesView.swift */; };
+		A1B2C3D4E5F602 /* WindowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F601 /* WindowDetector.swift */; };
+		A1B2C3D4E5F604 /* WindowPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F603 /* WindowPickerView.swift */; };
+		B1C2D3E4F5G602 /* CGEvent+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5G601 /* CGEvent+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -187,7 +193,10 @@
 				512 /* StatusBarView.swift in Sources */,
 				514 /* StatusOverlayView.swift in Sources */,
 				513 /* PreferencesView.swift in Sources */,
-			);
+			
+				A1B2C3D4E5F602 /* WindowDetector.swift in Sources */,
+				A1B2C3D4E5F604 /* WindowPickerView.swift in Sources */,
+				B1C2D3E4F5G602 /* CGEvent+Extensions.swift in Sources */,);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

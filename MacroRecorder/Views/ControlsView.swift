@@ -13,8 +13,73 @@ struct ControlsView: View {
 
     let onSave: () -> Void
 
+    @State private var showWindowPicker = false
+    @State private var selectedWindowTitle: String = "All Windows"
+
     var body: some View {
         VStack(spacing: 15) {
+            // Window-specific recording controls
+            HStack(alignment: .center, spacing: 15) {
+                Toggle("Window-Specific Recording", isOn: $session.isWindowSpecificMode)
+                    .toggleStyle(.switch)
+                    .disabled(session.isRecording)
+
+                if session.isWindowSpecificMode {
+                    Divider()
+                        .frame(height: 20)
+
+                    HStack(spacing: 10) {
+                        Label("Target:", systemImage: "macwindow")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 12))
+
+                        Button(action: {
+                            showWindowPicker = true
+                        }) {
+                            HStack(spacing: 4) {
+                                Text(selectedWindowTitle)
+                                    .lineLimit(1)
+                                    .frame(maxWidth: 200)
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 10))
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(session.isRecording)
+
+                        if session.targetWindow != nil {
+                            Button(action: {
+                                session.targetWindow = nil
+                                selectedWindowTitle = "All Windows"
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundColor(.secondary)
+                            .help("Clear window selection")
+                        }
+                    }
+
+                    Divider()
+                        .frame(height: 20)
+
+                    Toggle("Ghost Actions", isOn: $session.useGhostActions)
+                        .toggleStyle(.switch)
+                        .help("Send events to windows without focusing them")
+                }
+
+                Spacer()
+            }
+
+            .sheet(isPresented: $showWindowPicker) {
+                WindowPickerView(
+                    selectedWindow: $session.targetWindow,
+                    selectedTitle: $selectedWindowTitle
+                )
+            }
+
+            Divider()
+
             // Recording controls
             HStack(spacing: 15) {
                 Button(action: {

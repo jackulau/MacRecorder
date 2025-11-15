@@ -34,10 +34,15 @@ struct EventListView: View {
             // Event list header
             HStack {
                 if !selectedEvents.isEmpty {
-                    Text("\(selectedEvents.count) selected")
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
-                        .frame(width: 100, alignment: .leading)
+                    HStack(spacing: 4) {
+                        Text("\(selectedEvents.count)")
+                            .fontWeight(.medium)
+                            .foregroundColor(.accentColor)
+                        Text("selected")
+                            .foregroundColor(.accentColor)
+                    }
+                    .font(.caption)
+                    .frame(width: 100, alignment: .leading)
                 } else {
                     Text("Event")
                         .frame(width: 100, alignment: .leading)
@@ -54,27 +59,53 @@ struct EventListView: View {
 
                 Spacer()
 
-                if !selectedEvents.isEmpty {
-                    Button(action: {
-                        for eventId in selectedEvents {
-                            session.removeEvent(eventId: eventId)
+                HStack(spacing: 10) {
+                    if !selectedEvents.isEmpty {
+                        Button(action: {
+                            selectedEvents.removeAll()
+                            lastSelectedIndex = nil
+                        }) {
+                            Text("Clear")
+                                .font(.caption)
                         }
+                        .buttonStyle(.borderless)
+                        .help("Clear Selection (Esc)")
+
+                        Button(action: {
+                            for eventId in selectedEvents {
+                                session.removeEvent(eventId: eventId)
+                            }
+                            selectedEvents.removeAll()
+                            lastSelectedIndex = nil
+                        }) {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.borderless)
+                        .help("Delete Selected Events (⌫)")
+                    }
+
+                    Button(action: {
+                        // Select all
                         selectedEvents.removeAll()
+                        for event in macro.events {
+                            selectedEvents.insert(event.id)
+                        }
+                        lastSelectedIndex = macro.events.count - 1
                     }) {
-                        Image(systemName: "trash")
-                            .foregroundColor(.red)
+                        Image(systemName: "checkmark.square")
                     }
                     .buttonStyle(.borderless)
-                    .help("Delete Selected Events")
-                }
+                    .help("Select All (⌘A)")
 
-                Button(action: {
-                    showingEventCreator = true
-                }) {
-                    Image(systemName: "plus.circle.fill")
+                    Button(action: {
+                        showingEventCreator = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Add New Event")
                 }
-                .buttonStyle(.borderless)
-                .help("Add New Event")
             }
             .font(.caption)
             .foregroundColor(.secondary)
@@ -84,36 +115,44 @@ struct EventListView: View {
 
             Divider()
 
-            // Event list
+            // Event list with optimized rendering
             ScrollViewReader { proxy in
-                List(Array(macro.events.enumerated()), id: \.element.id) { index, event in
-                    EventRow(
-                        event: event,
-                        index: index,
-                        isSelected: selectedEvents.contains(event.id),
-                        isCurrent: currentEventIndex == index && session.isPlaying,
-                        onEdit: {
-                            editingEvent = event
-                            showingEventEditor = true
-                        },
-                        onDelete: {
-                            session.removeEvent(eventId: event.id)
-                            selectedEvents.remove(event.id)
+                ScrollView {
+                    LazyVStack(spacing: 2, pinnedViews: []) {
+                        ForEach(Array(macro.events.enumerated()), id: \.element.id) { index, event in
+                            EventRow(
+                                event: event,
+                                index: index,
+                                isSelected: selectedEvents.contains(event.id),
+                                isCurrent: currentEventIndex == index && session.isPlaying,
+                                onEdit: {
+                                    editingEvent = event
+                                    showingEventEditor = true
+                                },
+                                onDelete: {
+                                    session.removeEvent(eventId: event.id)
+                                    selectedEvents.remove(event.id)
+                                }
+                            )
+                            .id(event.id)
+                            .padding(.horizontal)
+                            .contentShape(Rectangle())
+                            .onTapGesture(count: 1) {
+                                let shiftPressed = NSEvent.modifierFlags.contains(.shift)
+                                let cmdPressed = NSEvent.modifierFlags.contains(.command)
+                                handleSelection(index: index, event: event, shiftPressed: shiftPressed, cmdPressed: cmdPressed)
+                            }
+                            .onDrag {
+                                self.draggedEventIndex = index
+                                return NSItemProvider(object: String(index) as NSString)
+                            }
+                            .onDrop(of: [.text], delegate: EventDropDelegate(
+                                destinationIndex: index,
+                                draggedIndex: $draggedEventIndex,
+                                session: session
+                            ))
                         }
-                    )
-                    .id(event.id)
-                    .onTapGesture(count: 1) { location in
-                        handleSelection(index: index, event: event, isShiftPressed: NSEvent.modifierFlags.contains(.shift))
                     }
-                    .onDrag {
-                        self.draggedEventIndex = index
-                        return NSItemProvider(object: String(index) as NSString)
-                    }
-                    .onDrop(of: [.text], delegate: EventDropDelegate(
-                        destinationIndex: index,
-                        draggedIndex: $draggedEventIndex,
-                        session: session
-                    ))
                 }
                 .onChange(of: currentEventIndex) { newIndex in
                     if newIndex < macro.events.count {
@@ -122,6 +161,12 @@ struct EventListView: View {
                         }
                     }
                 }
+            }
+        }
+        .onAppear {
+            // Ensure we can receive key events
+            DispatchQueue.main.async {
+                NSApp.keyWindow?.makeFirstResponder(nil)
             }
         }
         .sheet(isPresented: $showingEventEditor) {
@@ -151,29 +196,38 @@ struct EventListView: View {
         }
     }
 
-    private func handleSelection(index: Int, event: MacroEvent, isShiftPressed: Bool) {
-        if isShiftPressed, let lastIndex = lastSelectedIndex {
+    private func handleSelection(index: Int, event: MacroEvent, shiftPressed: Bool, cmdPressed: Bool) {
+        if shiftPressed {
             // Shift-click: select range
-            let startIndex = min(lastIndex, index)
-            let endIndex = max(lastIndex, index)
+            if let lastIndex = lastSelectedIndex {
+                let startIndex = min(lastIndex, index)
+                let endIndex = max(lastIndex, index)
 
-            // Clear current selection and select range
-            selectedEvents.removeAll()
-            for i in startIndex...endIndex {
-                if i < macro.events.count {
-                    selectedEvents.insert(macro.events[i].id)
+                // Add to existing selection when shift is pressed
+                for i in startIndex...endIndex {
+                    if i < macro.events.count {
+                        selectedEvents.insert(macro.events[i].id)
+                    }
                 }
+            } else {
+                // No previous selection, just select this one
+                selectedEvents.insert(event.id)
+                lastSelectedIndex = index
             }
-        } else if NSEvent.modifierFlags.contains(.command) {
+        } else if cmdPressed {
             // Cmd-click: toggle selection
             if selectedEvents.contains(event.id) {
                 selectedEvents.remove(event.id)
+                // Update last selected index if we're removing
+                if selectedEvents.isEmpty {
+                    lastSelectedIndex = nil
+                }
             } else {
                 selectedEvents.insert(event.id)
                 lastSelectedIndex = index
             }
         } else {
-            // Regular click: single selection
+            // Regular click: replace selection
             selectedEvents = [event.id]
             lastSelectedIndex = index
         }
@@ -233,9 +287,14 @@ struct EventRow: View {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
         .background(backgroundColor)
-        .cornerRadius(4)
+        .cornerRadius(6)
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
+        )
         .onHover { hovering in
             isHovering = hovering
         }
@@ -274,6 +333,8 @@ struct EventRow: View {
             return "keyboard"
         case .scroll:
             return "scroll"
+        case .windowFocus:
+            return "macwindow"
         }
     }
 
@@ -293,6 +354,8 @@ struct EventRow: View {
             return .mint
         case .scroll:
             return .indigo
+        case .windowFocus:
+            return .yellow
         }
     }
 
@@ -316,25 +379,44 @@ struct EventRow: View {
             return "Key Up"
         case .scroll:
             return "Scroll"
+        case .windowFocus:
+            return "Window Focus"
         }
     }
 
     private var eventDetails: String {
+        var details = ""
+
         switch event.type {
         case .mouseLeftDown, .mouseLeftUp, .mouseRightDown, .mouseRightUp, .mouseMove, .mouseDrag:
             if let pos = event.position {
-                return "(\(Int(pos.x)), \(Int(pos.y)))"
+                if let relPos = event.relativePosition {
+                    // Show relative position if available
+                    details = String(format: "(%.1f%%, %.1f%%)", relPos.x * 100, relPos.y * 100)
+                } else {
+                    details = "(\(Int(pos.x)), \(Int(pos.y)))"
+                }
             }
         case .keyDown, .keyUp:
             if let keyCode = event.keyCode {
-                return "Key: \(keyCode)"
+                details = "Key: \(keyCode)"
             }
         case .scroll:
             if let dx = event.scrollDeltaX, let dy = event.scrollDeltaY {
-                return "(\(Int(dx)), \(Int(dy)))"
+                details = "(\(Int(dx)), \(Int(dy)))"
+            }
+        case .windowFocus:
+            if let windowInfo = event.windowInfo {
+                details = windowInfo.windowTitle ?? "Window"
             }
         }
-        return "-"
+
+        // Add window indicator if event has window info
+        if event.windowInfo != nil && event.type != .windowFocus {
+            return "🪟 " + (details.isEmpty ? "-" : details)
+        }
+
+        return details.isEmpty ? "-" : details
     }
 }
 
@@ -401,6 +483,8 @@ struct TimelineView: View {
             return .green
         case .scroll:
             return .orange
+        case .windowFocus:
+            return .yellow
         }
     }
 }

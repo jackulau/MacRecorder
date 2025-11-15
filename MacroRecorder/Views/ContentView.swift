@@ -63,7 +63,7 @@ struct ContentView: View {
                     EventListView(
                         macro: macro,
                         session: session,
-                        currentEventIndex: session.player.currentEventIndex
+                        currentEventIndex: session.eventPlayer.currentEventIndex
                     )
                 } else {
                     EmptyStateView()
@@ -119,7 +119,7 @@ struct ContentView: View {
     }
 
     private func setupOverlayWindow() {
-        statusOverlayWindow = StatusOverlayWindow(session: session, player: session.player)
+        statusOverlayWindow = StatusOverlayWindow(session: session, player: session.eventPlayer)
         updateOverlayVisibility()
     }
 

@@ -11,22 +11,51 @@ class MacroSession: ObservableObject {
     @Published var savedMacros: [Macro] = []
     @Published var isRecording = false
     @Published var isPlaying = false
+    @Published var isWindowSpecificMode = false
+    @Published var targetWindow: WindowInfo?
+    @Published var useWindowScaling = false
+    @Published var useGhostActions = false
 
-    let recorder = EventRecorder()
-    let player = EventPlayer()
+    let eventRecorder = EventRecorder()
+    let eventPlayer = EventPlayer()
 
     private var cancellables = Set<AnyCancellable>()
     private let storageKey = "SavedMacros"
 
     init() {
-        // Observe recorder state
-        recorder.$isRecording
+        // Observe eventRecorder state
+        eventRecorder.$isRecording
             .assign(to: \.isRecording, on: self)
             .store(in: &cancellables)
 
-        // Observe player state
-        player.$isPlaying
+        // Observe eventPlayer state
+        eventPlayer.$isPlaying
             .assign(to: \.isPlaying, on: self)
+            .store(in: &cancellables)
+
+        // Sync window-specific recording settings
+        $isWindowSpecificMode
+            .assign(to: \.isWindowSpecificMode, on: eventRecorder)
+            .store(in: &cancellables)
+
+        $targetWindow
+            .assign(to: \.targetWindow, on: eventRecorder)
+            .store(in: &cancellables)
+
+        // Load window scaling preference from UserDefaults
+        let savedScaling = UserDefaults.standard.bool(forKey: "useWindowScaling")
+        useWindowScaling = savedScaling
+        eventPlayer.useWindowScaling = savedScaling
+
+        $useWindowScaling
+            .sink { [weak self] value in
+                self?.eventPlayer.useWindowScaling = value
+                UserDefaults.standard.set(value, forKey: "useWindowScaling")
+            }
+            .store(in: &cancellables)
+
+        $useGhostActions
+            .assign(to: \.useGhostActions, on: eventPlayer)
             .store(in: &cancellables)
 
         // Load saved macros
@@ -37,27 +66,27 @@ class MacroSession: ObservableObject {
 
     func startRecording() {
         guard !isRecording else { return }
-        recorder.startRecording()
+        eventRecorder.startRecording()
     }
 
     func stopRecording() {
         guard isRecording else { return }
-        recorder.stopRecording()
+        eventRecorder.stopRecording()
 
         // Create a new macro from recorded events
-        var macro = Macro(name: "Macro \(Date().formatted())", events: recorder.recordedEvents)
+        var macro = Macro(name: "Macro \(Date().formatted())", events: eventRecorder.recordedEvents)
         macro.updateDelays()
         currentMacro = macro
     }
 
     func clearCurrentMacro() {
-        recorder.clearRecording()
+        eventRecorder.clearRecording()
         currentMacro = nil
     }
 
     func setHotkeys(recording: (keyCode: UInt32, modifiers: UInt32), playback: (keyCode: UInt32, modifiers: UInt32)) {
-        recorder.recordingHotkey = recording
-        recorder.playbackHotkey = playback
+        eventRecorder.recordingHotkey = recording
+        eventRecorder.playbackHotkey = playback
     }
 
     func saveCurrentMacro(name: String? = nil) {
@@ -92,11 +121,11 @@ class MacroSession: ObservableObject {
 
     func play(macro: Macro, mode: PlaybackMode = .once, speed: Double = 1.0) {
         guard !isPlaying else { return }
-        player.play(events: macro.events, mode: mode, speed: speed)
+        eventPlayer.play(events: macro.events, mode: mode, speed: speed)
     }
 
     func stopPlayback() {
-        player.stop()
+        eventPlayer.stop()
     }
 
     // MARK: - Event Editing

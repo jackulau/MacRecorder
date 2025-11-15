@@ -16,6 +16,33 @@ enum EventType: String, Codable {
     case keyDown
     case keyUp
     case scroll
+    case windowFocus  // New event type for window focus
+}
+
+// Window information for window-specific recording
+struct WindowInfo: Codable {
+    let processID: Int32
+    let bundleIdentifier: String?
+    let windowTitle: String?
+    let windowBounds: CGRect  // Window frame at recording time
+    let isActive: Bool  // Whether window was focused
+    let windowID: CGWindowID?  // Window ID for capturing snapshots
+
+    // Calculate relative position within window
+    func relativePosition(from absolutePosition: CGPoint) -> CGPoint {
+        return CGPoint(
+            x: (absolutePosition.x - windowBounds.origin.x) / windowBounds.width,
+            y: (absolutePosition.y - windowBounds.origin.y) / windowBounds.height
+        )
+    }
+
+    // Convert relative position back to absolute based on current window size
+    func absolutePosition(from relativePosition: CGPoint, currentBounds: CGRect) -> CGPoint {
+        return CGPoint(
+            x: currentBounds.origin.x + (relativePosition.x * currentBounds.width),
+            y: currentBounds.origin.y + (relativePosition.y * currentBounds.height)
+        )
+    }
 }
 
 struct MacroEvent: Codable, Identifiable {
@@ -29,6 +56,10 @@ struct MacroEvent: Codable, Identifiable {
     let scrollDeltaY: Double?
     var delay: TimeInterval // Time since previous event
 
+    // Window-specific recording fields
+    let windowInfo: WindowInfo?  // Window information at time of recording
+    let relativePosition: CGPoint?  // Position relative to window (0-1 range)
+
     init(
         id: UUID = UUID(),
         type: EventType,
@@ -38,7 +69,9 @@ struct MacroEvent: Codable, Identifiable {
         flags: UInt64? = nil,
         scrollDeltaX: Double? = nil,
         scrollDeltaY: Double? = nil,
-        delay: TimeInterval = 0
+        delay: TimeInterval = 0,
+        windowInfo: WindowInfo? = nil,
+        relativePosition: CGPoint? = nil
     ) {
         self.id = id
         self.type = type
@@ -49,6 +82,8 @@ struct MacroEvent: Codable, Identifiable {
         self.scrollDeltaX = scrollDeltaX
         self.scrollDeltaY = scrollDeltaY
         self.delay = delay
+        self.windowInfo = windowInfo
+        self.relativePosition = relativePosition
     }
 
     // Create from CGEvent
@@ -109,6 +144,11 @@ struct MacroEvent: Codable, Identifiable {
 
     // Create CGEvent for playback
     func toCGEvent() -> CGEvent? {
+        // Window focus events don't generate CGEvents
+        if type == .windowFocus {
+            return nil
+        }
+
         let eventType: CGEventType
 
         switch type {
@@ -130,6 +170,8 @@ struct MacroEvent: Codable, Identifiable {
             eventType = .keyUp
         case .scroll:
             eventType = .scrollWheel
+        case .windowFocus:
+            return nil  // Already handled above
         }
 
         var event: CGEvent?
@@ -151,6 +193,8 @@ struct MacroEvent: Codable, Identifiable {
                           wheel1: Int32(scrollDeltaY ?? 0),
                           wheel2: Int32(scrollDeltaX ?? 0),
                           wheel3: 0)
+        case .windowFocus:
+            return nil  // Window focus events don't generate CGEvents
         }
 
         if let flags = flags {

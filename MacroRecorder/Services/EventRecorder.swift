@@ -12,11 +12,14 @@ import Carbon
 class EventRecorder: ObservableObject {
     @Published var isRecording = false
     @Published var recordedEvents: [MacroEvent] = []
+    @Published var isWindowSpecificMode = false  // Toggle for window-specific recording
+    @Published var targetWindow: WindowInfo?      // The window to record in
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var lastEventTime: TimeInterval = 0
     private var startTime: TimeInterval = 0
+    private var windowDetector = WindowDetector.shared
 
     // Store hotkeys to filter them out during recording
     var recordingHotkey: (keyCode: UInt32, modifiers: UInt32)?
@@ -169,16 +172,104 @@ class EventRecorder: ObservableObject {
             }
         }
 
-        // Filter out excessive mouse move events to optimize recording
+        // Performance optimization: filter out excessive events
         if type == .mouseMoved {
-            // Only record mouse moves if there's a significant delay (e.g., > 100ms)
-            // or if it's been a while since last recorded move
-            if delay < 0.1 {
-                return
+            // Only record mouse moves if there's a significant delay
+            if delay < 0.05 { // Reduced from 0.1 for smoother recording
+                // Also check distance from last position if we have one
+                if let lastEvent = recordedEvents.last,
+                   let lastPos = lastEvent.position {
+                    let currentPos = event.location
+                    let distance = sqrt(pow(currentPos.x - lastPos.x, 2) + pow(currentPos.y - lastPos.y, 2))
+                    if distance < 10 { // Skip if mouse moved less than 10 pixels
+                        return
+                    }
+                } else {
+                    return
+                }
             }
         }
 
-        if let macroEvent = MacroEvent.from(cgEvent: event, delay: delay) {
+        // Limit total events for performance (optional safety limit)
+        if recordedEvents.count > 10000 {
+            print("Warning: Reached maximum event limit for performance")
+            return
+        }
+
+        if var macroEvent = MacroEvent.from(cgEvent: event, delay: delay) {
+            // If window-specific mode is enabled, capture window information
+            if isWindowSpecificMode {
+                if let position = macroEvent.position {
+                    // Get window info at the event position
+                    if let windowInfo = windowDetector.getWindowInfo(at: position) {
+                        // If we have a target window, only record events in that window
+                        if let target = targetWindow {
+                            // Check if the event is in the target window
+                            if windowInfo.processID != target.processID {
+                                return // Skip events not in target window
+                            }
+                        }
+
+                        // Calculate relative position within the window
+                        let relativePos = windowInfo.relativePosition(from: position)
+
+                        // Create new event with window information
+                        macroEvent = MacroEvent(
+                            id: macroEvent.id,
+                            type: macroEvent.type,
+                            timestamp: macroEvent.timestamp,
+                            position: macroEvent.position,
+                            keyCode: macroEvent.keyCode,
+                            flags: macroEvent.flags,
+                            scrollDeltaX: macroEvent.scrollDeltaX,
+                            scrollDeltaY: macroEvent.scrollDeltaY,
+                            delay: macroEvent.delay,
+                            windowInfo: windowInfo,
+                            relativePosition: relativePos
+                        )
+
+                        // Add window focus event if window changed
+                        if let lastEvent = recordedEvents.last,
+                           let lastWindow = lastEvent.windowInfo,
+                           lastWindow.processID != windowInfo.processID {
+                            // Insert a window focus event
+                            let focusEvent = MacroEvent(
+                                type: .windowFocus,
+                                timestamp: currentTime,
+                                delay: 0,
+                                windowInfo: windowInfo,
+                                relativePosition: nil
+                            )
+                            recordedEvents.append(focusEvent)
+                        }
+                    }
+                } else if macroEvent.type == .keyDown || macroEvent.type == .keyUp {
+                    // For keyboard events, get the frontmost window info
+                    if let windowInfo = windowDetector.getFrontmostWindowInfo() {
+                        // If we have a target window, only record events when it's focused
+                        if let target = targetWindow {
+                            if windowInfo.processID != target.processID {
+                                return // Skip keyboard events when target window isn't focused
+                            }
+                        }
+
+                        macroEvent = MacroEvent(
+                            id: macroEvent.id,
+                            type: macroEvent.type,
+                            timestamp: macroEvent.timestamp,
+                            position: macroEvent.position,
+                            keyCode: macroEvent.keyCode,
+                            flags: macroEvent.flags,
+                            scrollDeltaX: macroEvent.scrollDeltaX,
+                            scrollDeltaY: macroEvent.scrollDeltaY,
+                            delay: macroEvent.delay,
+                            windowInfo: windowInfo,
+                            relativePosition: nil
+                        )
+                    }
+                }
+            }
+
             recordedEvents.append(macroEvent)
             lastEventTime = currentTime
         }

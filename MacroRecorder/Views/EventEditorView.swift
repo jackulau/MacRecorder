@@ -132,6 +132,8 @@ struct EventEditorView: View {
             return "Key Up"
         case .scroll:
             return "Scroll"
+        case .windowFocus:
+            return "Window Focus"
         }
     }
 
