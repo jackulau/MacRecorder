@@ -187,7 +187,7 @@ class MacroSession: ObservableObject {
             let data = try encoder.encode(savedMacros)
             UserDefaults.standard.set(data, forKey: storageKey)
         } catch {
-            print("Failed to save macros: \(error)")
+            NSLog("MacroRecorder: Failed to save macros - \(error.localizedDescription)")
         }
     }
 
@@ -199,7 +199,7 @@ class MacroSession: ObservableObject {
             decoder.dateDecodingStrategy = .iso8601
             savedMacros = try decoder.decode([Macro].self, from: data)
         } catch {
-            print("Failed to load macros: \(error)")
+            NSLog("MacroRecorder: Failed to load macros - \(error.localizedDescription)")
         }
     }
 

@@ -56,7 +56,7 @@ class EventRecorder: ObservableObject {
 
         // Check for accessibility permissions
         guard checkAccessibilityPermissions() else {
-            print("Accessibility permissions not granted")
+            NSLog("MacroRecorder: Accessibility permissions not granted")
             return
         }
 
@@ -86,7 +86,7 @@ class EventRecorder: ObservableObject {
         )
 
         guard let eventTap = eventTap else {
-            print("Failed to create event tap")
+            NSLog("MacroRecorder: Failed to create event tap")
             return
         }
 
@@ -94,7 +94,7 @@ class EventRecorder: ObservableObject {
         runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
 
         guard let runLoopSource = runLoopSource else {
-            print("Failed to create run loop source")
+            NSLog("MacroRecorder: Failed to create run loop source")
             return
         }
 
@@ -103,7 +103,6 @@ class EventRecorder: ObservableObject {
         CGEvent.tapEnable(tap: eventTap, enable: true)
 
         isRecording = true
-        print("Recording started")
     }
 
     func stopRecording() {
@@ -120,8 +119,6 @@ class EventRecorder: ObservableObject {
         eventTap = nil
         runLoopSource = nil
         isRecording = false
-
-        print("Recording stopped. Captured \(recordedEvents.count) events")
     }
 
     private func handleEvent(event: CGEvent, type: CGEventType) {
@@ -149,8 +146,7 @@ class EventRecorder: ObservableObject {
 
                     if cmdPressed == expectedCmd && shiftPressed == expectedShift &&
                        optPressed == expectedOpt && ctrlPressed == expectedCtrl {
-                        print("Filtered out recording hotkey event")
-                        return
+                        return // Filtered out recording hotkey
                     }
                 }
             }
@@ -165,8 +161,7 @@ class EventRecorder: ObservableObject {
 
                     if cmdPressed == expectedCmd && shiftPressed == expectedShift &&
                        optPressed == expectedOpt && ctrlPressed == expectedCtrl {
-                        print("Filtered out playback hotkey event")
-                        return
+                        return // Filtered out playback hotkey
                     }
                 }
             }
@@ -191,8 +186,8 @@ class EventRecorder: ObservableObject {
         }
 
         // Limit total events for performance (optional safety limit)
-        if recordedEvents.count > 10000 {
-            print("Warning: Reached maximum event limit for performance")
+        if recordedEvents.count >= 10000 {
+            NSLog("MacroRecorder: Maximum event limit reached (10,000)")
             return
         }
 

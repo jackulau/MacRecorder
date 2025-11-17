@@ -124,11 +124,7 @@ struct ControlsView: View {
                 .keyboardShortcut("s", modifiers: [.command])
 
                 Button(action: {
-                    if #available(macOS 14, *) {
-                        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                    } else if #available(macOS 13, *) {
-                        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-                    }
+                    openSettings()
                 }) {
                     Image(systemName: "gearshape")
                 }
@@ -198,6 +194,17 @@ struct ControlsView: View {
 
                 Spacer()
             }
+        }
+    }
+
+    private func openSettings() {
+        if #available(macOS 14, *) {
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        } else if #available(macOS 13, *) {
+            NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+        } else {
+            // Fallback for older macOS versions
+            NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
         }
     }
 }

@@ -169,7 +169,7 @@ struct ContentView: View {
                 do {
                     try session.exportMacro(macro, to: url)
                 } catch {
-                    print("Export failed: \(error)")
+                    NSLog("MacroRecorder: Failed to export macro - \(error.localizedDescription)")
                 }
             }
         }
@@ -187,7 +187,7 @@ struct ContentView: View {
                     session.loadMacro(macro)
                     session.saveCurrentMacro()
                 } catch {
-                    print("Import failed: \(error)")
+                    NSLog("MacroRecorder: Failed to import macro - \(error.localizedDescription)")
                 }
             }
         }

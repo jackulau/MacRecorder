@@ -138,8 +138,6 @@ class HotkeyManager: ObservableObject {
             0,
             &playbackEventHandler
         )
-
-        print("Hotkeys registered")
     }
 
     func unregisterHotkeys() {
@@ -176,8 +174,6 @@ class HotkeyManager: ObservableObject {
 
         // Re-register with new hotkeys
         registerHotkeys()
-
-        print("Hotkeys reloaded successfully")
     }
 
     deinit {

@@ -18,7 +18,7 @@ extension CGEvent {
         // Get the running application for this PID
         let runningApps = NSWorkspace.shared.runningApplications
 
-        if let app = runningApps.first(where: { $0.processIdentifier == pid }) {
+        if runningApps.contains(where: { $0.processIdentifier == pid }) {
             // For ghost actions, we don't activate the app
             // The event system will route it to the correct process based on the PID
 
