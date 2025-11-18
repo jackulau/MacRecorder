@@ -54,21 +54,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func checkAccessibilityPermissions() {
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-        let accessEnabled = AXIsProcessTrustedWithOptions(options)
+        // First check without prompting
+        let accessEnabled = AXIsProcessTrusted()
 
         if !accessEnabled {
+            // Only show prompt if not already trusted
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 let alert = NSAlert()
                 alert.messageText = "Accessibility Permissions Required"
-                alert.informativeText = "MacroRecorder needs accessibility permissions to record and playback mouse and keyboard events. Please grant access in System Preferences > Security & Privacy > Privacy > Accessibility."
+                alert.informativeText = "MacroRecorder needs accessibility permissions to record and playback mouse and keyboard events. Please grant access in System Settings > Privacy & Security > Accessibility."
                 alert.alertStyle = .warning
-                alert.addButton(withTitle: "Open System Preferences")
+                alert.addButton(withTitle: "Open System Settings")
                 alert.addButton(withTitle: "Later")
 
                 if alert.runModal() == .alertFirstButtonReturn {
-                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                        NSWorkspace.shared.open(url)
+                    // For macOS 13+ use the new Settings app URL scheme
+                    if #available(macOS 13, *) {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    } else {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                            NSWorkspace.shared.open(url)
+                        }
                     }
                 }
             }

@@ -8,6 +8,7 @@ import CoreGraphics
 import Combine
 import ApplicationServices
 import Carbon
+import AppKit
 
 class EventRecorder: ObservableObject {
     @Published var isRecording = false
@@ -57,6 +58,20 @@ class EventRecorder: ObservableObject {
         // Check for accessibility permissions
         guard checkAccessibilityPermissions() else {
             NSLog("MacroRecorder: Accessibility permissions not granted")
+            DispatchQueue.main.async {
+                let alert = NSAlert()
+                alert.messageText = "Accessibility Permission Required"
+                alert.informativeText = "Please grant MacroRecorder accessibility permission in System Settings > Privacy & Security > Accessibility, then restart the app."
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "Open System Settings")
+                alert.addButton(withTitle: "OK")
+
+                if alert.runModal() == .alertFirstButtonReturn {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+            }
             return
         }
 
@@ -271,8 +286,9 @@ class EventRecorder: ObservableObject {
     }
 
     func checkAccessibilityPermissions() -> Bool {
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-        return AXIsProcessTrustedWithOptions(options)
+        // Check without prompting - just return the status
+        // The app will handle showing prompts at launch
+        return AXIsProcessTrusted()
     }
 
     func clearRecording() {
