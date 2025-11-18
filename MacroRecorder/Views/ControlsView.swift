@@ -63,9 +63,9 @@ struct ControlsView: View {
                     Divider()
                         .frame(height: 20)
 
-                    Toggle("Ghost Actions", isOn: $session.useGhostActions)
+                    Toggle("Ghost Actions (Experimental)", isOn: $session.useGhostActions)
                         .toggleStyle(.switch)
-                        .help("Send events to windows without focusing them")
+                        .help("Attempts to send events without focusing the window. Note: Mouse events may still move cursor due to macOS limitations. Works best for button clicks via Accessibility API.")
                 }
 
                 Spacer()
