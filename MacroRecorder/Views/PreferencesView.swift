@@ -151,47 +151,58 @@ struct RecordingPreferencesView: View {
 
 struct HotkeyPreferencesView: View {
     @AppStorage("recordingHotkeyData") private var recordingHotkeyData: Data = {
-        let defaultConfig = HotkeyConfig(keyCode: 0x2C, modifiers: UInt32(cmdKey | shiftKey))
-        return (try? JSONEncoder().encode(defaultConfig)) ?? Data()
+        return (try? JSONEncoder().encode(HotkeyConfig.defaultRecording)) ?? Data()
     }()
 
     @AppStorage("playbackHotkeyData") private var playbackHotkeyData: Data = {
-        let defaultConfig = HotkeyConfig(keyCode: 0x23, modifiers: UInt32(cmdKey | shiftKey))
-        return (try? JSONEncoder().encode(defaultConfig)) ?? Data()
+        return (try? JSONEncoder().encode(HotkeyConfig.defaultPlayback)) ?? Data()
     }()
 
-    @State private var recordingHotkey: HotkeyConfig = HotkeyConfig(keyCode: 0x2C, modifiers: UInt32(cmdKey | shiftKey))
-    @State private var playbackHotkey: HotkeyConfig = HotkeyConfig(keyCode: 0x23, modifiers: UInt32(cmdKey | shiftKey))
+    @State private var recordingHotkey: HotkeyConfig = HotkeyConfig.defaultRecording
+    @State private var playbackHotkey: HotkeyConfig = HotkeyConfig.defaultPlayback
     @State private var showResetConfirm = false
+    @State private var showConflictAlert = false
+    @State private var conflictMessage = ""
+
+    private var hasConflict: Bool {
+        recordingHotkey == playbackHotkey
+    }
 
     var body: some View {
         Form {
             Section("Global Hotkeys") {
                 VStack(spacing: 15) {
-                    // KeybindCaptureView temporarily disabled - displaying static text
-                    HStack {
-                        Text("Start/Stop Recording")
-                            .frame(width: 150, alignment: .leading)
-                        Text(recordingHotkey.displayString)
-                            .font(.system(.body, design: .monospaced))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color(NSColor.controlBackgroundColor))
-                            .cornerRadius(6)
-                    }
+                    KeybindCaptureView(hotkeyConfig: $recordingHotkey, label: "Start/Stop Recording")
+                        .onChange(of: recordingHotkey) { newValue in
+                            if newValue == playbackHotkey {
+                                showConflictAlert = true
+                                conflictMessage = "Recording hotkey conflicts with Playback hotkey. Please choose a different combination."
+                            } else {
+                                saveRecordingHotkey(newValue)
+                            }
+                        }
 
-                    HStack {
-                        Text("Play/Stop Playback")
-                            .frame(width: 150, alignment: .leading)
-                        Text(playbackHotkey.displayString)
-                            .font(.system(.body, design: .monospaced))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color(NSColor.controlBackgroundColor))
-                            .cornerRadius(6)
-                    }
+                    KeybindCaptureView(hotkeyConfig: $playbackHotkey, label: "Play/Stop Playback")
+                        .onChange(of: playbackHotkey) { newValue in
+                            if newValue == recordingHotkey {
+                                showConflictAlert = true
+                                conflictMessage = "Playback hotkey conflicts with Recording hotkey. Please choose a different combination."
+                            } else {
+                                savePlaybackHotkey(newValue)
+                            }
+                        }
                 }
                 .padding(.vertical, 5)
+
+                if hasConflict {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                        Text("Hotkeys conflict! Both actions use the same key combination.")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                }
 
                 Divider()
 
@@ -203,18 +214,20 @@ struct HotkeyPreferencesView: View {
 
                     Spacer()
 
-                    Text("Hotkey changes take effect immediately")
-                        .font(.caption)
-                        .foregroundColor(.green)
+                    if !hasConflict {
+                        Text("Hotkey changes take effect immediately")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    }
                 }
             }
 
             Section("Instructions") {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("• Click on a hotkey button to start recording")
-                    Text("• Press your desired key combination (must include ⌘, ⌥, ⌃, or ⇧)")
-                    Text("• The hotkey will be saved automatically")
-                    Text("• Avoid using system-reserved shortcuts")
+                    Text("Click on a hotkey button to start recording")
+                    Text("Press your desired key combination (must include a modifier key)")
+                    Text("The hotkey will be saved automatically")
+                    Text("Avoid using system-reserved shortcuts (e.g., Cmd+Q, Cmd+W)")
                 }
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -232,6 +245,14 @@ struct HotkeyPreferencesView: View {
             }
         } message: {
             Text("This will reset all hotkeys to their default values.")
+        }
+        .alert("Hotkey Conflict", isPresented: $showConflictAlert) {
+            Button("OK", role: .cancel) {
+                // Revert to previously saved hotkey
+                loadHotkeys()
+            }
+        } message: {
+            Text(conflictMessage)
         }
     }
 
@@ -261,8 +282,8 @@ struct HotkeyPreferencesView: View {
     }
 
     private func resetToDefaults() {
-        recordingHotkey = HotkeyConfig(keyCode: 0x2C, modifiers: UInt32(cmdKey | shiftKey))
-        playbackHotkey = HotkeyConfig(keyCode: 0x23, modifiers: UInt32(cmdKey | shiftKey))
+        recordingHotkey = HotkeyConfig.defaultRecording
+        playbackHotkey = HotkeyConfig.defaultPlayback
         saveRecordingHotkey(recordingHotkey)
         savePlaybackHotkey(playbackHotkey)
     }

@@ -335,6 +335,24 @@ struct EventRow: View {
             return "scroll"
         case .windowFocus:
             return "macwindow"
+        case .appleScript, .appleScriptFile:
+            return "applescript"
+        case .conditionStart:
+            return "arrow.branch"
+        case .conditionElse:
+            return "arrow.triangle.branch"
+        case .conditionEnd:
+            return "arrow.triangle.merge"
+        case .loopStart:
+            return "repeat"
+        case .loopEnd:
+            return "repeat.1"
+        case .breakLoop:
+            return "stop.circle"
+        case .continueLoop:
+            return "arrow.forward.to.line"
+        case .clickImage, .waitForImage, .dragToImage:
+            return "photo"
         }
     }
 
@@ -356,32 +374,19 @@ struct EventRow: View {
             return .indigo
         case .windowFocus:
             return .yellow
+        case .appleScript, .appleScriptFile:
+            return .teal
+        case .conditionStart, .conditionElse, .conditionEnd:
+            return .pink
+        case .loopStart, .loopEnd, .breakLoop, .continueLoop:
+            return .brown
+        case .clickImage, .waitForImage, .dragToImage:
+            return .gray
         }
     }
 
     private var eventTypeName: String {
-        switch event.type {
-        case .mouseLeftDown:
-            return "Left Click"
-        case .mouseLeftUp:
-            return "Left Release"
-        case .mouseRightDown:
-            return "Right Click"
-        case .mouseRightUp:
-            return "Right Release"
-        case .mouseMove:
-            return "Mouse Move"
-        case .mouseDrag:
-            return "Mouse Drag"
-        case .keyDown:
-            return "Key Down"
-        case .keyUp:
-            return "Key Up"
-        case .scroll:
-            return "Scroll"
-        case .windowFocus:
-            return "Window Focus"
-        }
+        return event.type.displayName
     }
 
     private var eventDetails: String {
@@ -409,6 +414,22 @@ struct EventRow: View {
             if let windowInfo = event.windowInfo {
                 details = windowInfo.windowTitle ?? "Window"
             }
+        case .appleScript, .appleScriptFile:
+            details = event.scriptContent != nil ? "Inline script" : (event.scriptPath ?? "Script")
+        case .conditionStart, .conditionElse, .conditionEnd:
+            details = event.controlFlowConfig?.condition?.displayString ?? "Condition"
+        case .loopStart, .loopEnd:
+            if let count = event.controlFlowConfig?.loopCount {
+                details = "Count: \(count)"
+            } else {
+                details = "Loop"
+            }
+        case .breakLoop:
+            details = "Exit loop"
+        case .continueLoop:
+            details = "Next iteration"
+        case .clickImage, .waitForImage, .dragToImage:
+            details = "Image match"
         }
 
         // Add window indicator if event has window info
@@ -485,6 +506,14 @@ struct TimelineView: View {
             return .orange
         case .windowFocus:
             return .yellow
+        case .appleScript, .appleScriptFile:
+            return .teal
+        case .conditionStart, .conditionElse, .conditionEnd:
+            return .pink
+        case .loopStart, .loopEnd, .breakLoop, .continueLoop:
+            return .brown
+        case .clickImage, .waitForImage, .dragToImage:
+            return .gray
         }
     }
 }

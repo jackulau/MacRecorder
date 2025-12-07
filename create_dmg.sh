@@ -5,7 +5,7 @@
 
 APP_NAME="MacroRecorder"
 APP_BUNDLE="build/${APP_NAME}.app"
-DMG_NAME="${APP_NAME}-v1.0.3"
+DMG_NAME="${APP_NAME}-v1.1.0"
 VOLUME_NAME="${APP_NAME}"
 DMG_TEMP="${DMG_NAME}-temp.dmg"
 DMG_FINAL="${DMG_NAME}.dmg"
@@ -35,7 +35,7 @@ ln -s /Applications "$STAGING_DIR/Applications"
 
 # Create a README
 cat > "$STAGING_DIR/README.txt" << 'EOF'
-MacroRecorder v1.0.1
+MacroRecorder v1.1.0
 ====================
 
 Thank you for downloading MacroRecorder!
@@ -46,14 +46,22 @@ Installation Instructions:
 3. Grant Accessibility permissions when prompted
    (System Settings → Privacy & Security → Accessibility)
 
-Features:
+Core Features:
 - Record mouse clicks, movements, and keyboard input
 - Playback macros at variable speeds
-- Edit and customize event delays
-- Drag and drop to reorder events
-- Manually create new events
+- Window-specific recording and playback
 - Global hotkeys for quick access
 - Save and load macros
+
+New in v1.1.0:
+- Customizable Hotkeys: Configure your own shortcuts
+- Variable Delays & Random Intervals: Add dynamic timing
+- Interactive Timeline Editor: Drag events to adjust timing
+- AppleScript Integration: Execute scripts within macros
+- Conditional Playback: If/else logic and loops
+- Image-Based Positioning: Click on visual elements
+- Macro Templates Library: Pre-built templates to get started
+- Cloud Sync: Sync macros across devices via iCloud
 
 Support:
 For issues or questions, please visit the project repository.
@@ -61,6 +69,7 @@ For issues or questions, please visit the project repository.
 Minimum Requirements:
 - macOS 13.0 (Ventura) or later
 - Accessibility permissions required
+- iCloud account (for cloud sync feature)
 
 Copyright © 2025. All rights reserved.
 EOF

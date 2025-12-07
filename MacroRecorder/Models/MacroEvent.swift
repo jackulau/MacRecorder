@@ -17,6 +17,61 @@ enum EventType: String, Codable {
     case keyUp
     case scroll
     case windowFocus  // New event type for window focus
+
+    // AppleScript events
+    case appleScript       // Execute inline AppleScript
+    case appleScriptFile   // Execute AppleScript from file
+
+    // Conditional/control flow events
+    case conditionStart    // If condition begins
+    case conditionElse     // Else branch
+    case conditionEnd      // End of conditional block
+    case loopStart         // Loop begins
+    case loopEnd           // Loop ends
+    case breakLoop         // Break out of loop
+    case continueLoop      // Continue to next iteration
+
+    // Image-based events
+    case clickImage        // Click on found image
+    case waitForImage      // Wait for image to appear
+    case dragToImage       // Drag to image location
+
+    var displayName: String {
+        switch self {
+        case .mouseLeftDown: return "Left Click Down"
+        case .mouseLeftUp: return "Left Click Up"
+        case .mouseRightDown: return "Right Click Down"
+        case .mouseRightUp: return "Right Click Up"
+        case .mouseMove: return "Mouse Move"
+        case .mouseDrag: return "Mouse Drag"
+        case .keyDown: return "Key Down"
+        case .keyUp: return "Key Up"
+        case .scroll: return "Scroll"
+        case .windowFocus: return "Window Focus"
+        case .appleScript: return "AppleScript"
+        case .appleScriptFile: return "AppleScript File"
+        case .conditionStart: return "If Condition"
+        case .conditionElse: return "Else"
+        case .conditionEnd: return "End If"
+        case .loopStart: return "Loop Start"
+        case .loopEnd: return "Loop End"
+        case .breakLoop: return "Break"
+        case .continueLoop: return "Continue"
+        case .clickImage: return "Click Image"
+        case .waitForImage: return "Wait For Image"
+        case .dragToImage: return "Drag To Image"
+        }
+    }
+
+    var isControlFlow: Bool {
+        switch self {
+        case .conditionStart, .conditionElse, .conditionEnd,
+             .loopStart, .loopEnd, .breakLoop, .continueLoop:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 // Window information for window-specific recording
@@ -54,11 +109,56 @@ struct MacroEvent: Codable, Identifiable {
     let flags: UInt64?
     let scrollDeltaX: Double?
     let scrollDeltaY: Double?
-    var delay: TimeInterval // Time since previous event
+
+    // Legacy delay field - kept for backward compatibility
+    private var _delay: TimeInterval
+
+    // New delay configuration - supports fixed, random, variable, expression
+    var delayConfig: DelayConfig?
+
+    /// Computed delay property for backward compatibility
+    /// Gets: returns fixed value from delayConfig, or legacy _delay
+    /// Sets: updates both _delay and delayConfig
+    var delay: TimeInterval {
+        get {
+            if let config = delayConfig {
+                return config.fixedValue ?? _delay
+            }
+            return _delay
+        }
+        set {
+            _delay = newValue
+            delayConfig = .fixed(newValue)
+        }
+    }
 
     // Window-specific recording fields
     let windowInfo: WindowInfo?  // Window information at time of recording
     let relativePosition: CGPoint?  // Position relative to window (0-1 range)
+
+    // AppleScript fields
+    var scriptContent: String?          // Inline AppleScript code
+    var scriptPath: String?             // Path to AppleScript file
+    var scriptTimeout: TimeInterval?    // Max execution time
+    var captureScriptOutput: Bool?      // Whether to capture output
+    var outputVariableName: String?     // Variable to store output
+
+    // Control flow fields
+    var controlFlowConfig: ControlFlowConfig?  // Condition/loop configuration
+
+    // Image-based event fields
+    var imageEventConfig: ImageEventConfig?    // Image template configuration
+
+    // Custom coding keys to handle the private _delay field
+    enum CodingKeys: String, CodingKey {
+        case id, type, timestamp, position, keyCode, flags
+        case scrollDeltaX, scrollDeltaY
+        case _delay = "delay"  // Map _delay to "delay" in JSON
+        case delayConfig
+        case windowInfo, relativePosition
+        case scriptContent, scriptPath, scriptTimeout, captureScriptOutput, outputVariableName
+        case controlFlowConfig, imageEventConfig
+    }
 
     init(
         id: UUID = UUID(),
@@ -70,8 +170,16 @@ struct MacroEvent: Codable, Identifiable {
         scrollDeltaX: Double? = nil,
         scrollDeltaY: Double? = nil,
         delay: TimeInterval = 0,
+        delayConfig: DelayConfig? = nil,
         windowInfo: WindowInfo? = nil,
-        relativePosition: CGPoint? = nil
+        relativePosition: CGPoint? = nil,
+        scriptContent: String? = nil,
+        scriptPath: String? = nil,
+        scriptTimeout: TimeInterval? = nil,
+        captureScriptOutput: Bool? = nil,
+        outputVariableName: String? = nil,
+        controlFlowConfig: ControlFlowConfig? = nil,
+        imageEventConfig: ImageEventConfig? = nil
     ) {
         self.id = id
         self.type = type
@@ -81,9 +189,50 @@ struct MacroEvent: Codable, Identifiable {
         self.flags = flags
         self.scrollDeltaX = scrollDeltaX
         self.scrollDeltaY = scrollDeltaY
-        self.delay = delay
+        self._delay = delay
+        self.delayConfig = delayConfig ?? .fixed(delay)
         self.windowInfo = windowInfo
         self.relativePosition = relativePosition
+        self.scriptContent = scriptContent
+        self.scriptPath = scriptPath
+        self.scriptTimeout = scriptTimeout
+        self.captureScriptOutput = captureScriptOutput
+        self.outputVariableName = outputVariableName
+        self.controlFlowConfig = controlFlowConfig
+        self.imageEventConfig = imageEventConfig
+    }
+
+    // Custom decoder to handle legacy macros without new fields
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(UUID.self, forKey: .id)
+        type = try container.decode(EventType.self, forKey: .type)
+        timestamp = try container.decode(TimeInterval.self, forKey: .timestamp)
+        position = try container.decodeIfPresent(CGPoint.self, forKey: .position)
+        keyCode = try container.decodeIfPresent(UInt16.self, forKey: .keyCode)
+        flags = try container.decodeIfPresent(UInt64.self, forKey: .flags)
+        scrollDeltaX = try container.decodeIfPresent(Double.self, forKey: .scrollDeltaX)
+        scrollDeltaY = try container.decodeIfPresent(Double.self, forKey: .scrollDeltaY)
+        _delay = try container.decode(TimeInterval.self, forKey: ._delay)
+        windowInfo = try container.decodeIfPresent(WindowInfo.self, forKey: .windowInfo)
+        relativePosition = try container.decodeIfPresent(CGPoint.self, forKey: .relativePosition)
+
+        // Try to decode delayConfig, fallback to creating from legacy delay
+        if let config = try container.decodeIfPresent(DelayConfig.self, forKey: .delayConfig) {
+            delayConfig = config
+        } else {
+            delayConfig = .fixed(_delay)
+        }
+
+        // Decode new optional fields (nil for legacy macros)
+        scriptContent = try container.decodeIfPresent(String.self, forKey: .scriptContent)
+        scriptPath = try container.decodeIfPresent(String.self, forKey: .scriptPath)
+        scriptTimeout = try container.decodeIfPresent(TimeInterval.self, forKey: .scriptTimeout)
+        captureScriptOutput = try container.decodeIfPresent(Bool.self, forKey: .captureScriptOutput)
+        outputVariableName = try container.decodeIfPresent(String.self, forKey: .outputVariableName)
+        controlFlowConfig = try container.decodeIfPresent(ControlFlowConfig.self, forKey: .controlFlowConfig)
+        imageEventConfig = try container.decodeIfPresent(ImageEventConfig.self, forKey: .imageEventConfig)
     }
 
     // Create from CGEvent
@@ -144,9 +293,15 @@ struct MacroEvent: Codable, Identifiable {
 
     // Create CGEvent for playback
     func toCGEvent() -> CGEvent? {
-        // Window focus events don't generate CGEvents
-        if type == .windowFocus {
+        // These event types don't generate CGEvents - they're handled by EventPlayer
+        switch type {
+        case .windowFocus, .appleScript, .appleScriptFile,
+             .conditionStart, .conditionElse, .conditionEnd,
+             .loopStart, .loopEnd, .breakLoop, .continueLoop,
+             .clickImage, .waitForImage, .dragToImage:
             return nil
+        default:
+            break
         }
 
         let eventType: CGEventType
@@ -170,7 +325,10 @@ struct MacroEvent: Codable, Identifiable {
             eventType = .keyUp
         case .scroll:
             eventType = .scrollWheel
-        case .windowFocus:
+        case .windowFocus, .appleScript, .appleScriptFile,
+             .conditionStart, .conditionElse, .conditionEnd,
+             .loopStart, .loopEnd, .breakLoop, .continueLoop,
+             .clickImage, .waitForImage, .dragToImage:
             return nil  // Already handled above
         }
 
@@ -193,8 +351,11 @@ struct MacroEvent: Codable, Identifiable {
                           wheel1: Int32(scrollDeltaY ?? 0),
                           wheel2: Int32(scrollDeltaX ?? 0),
                           wheel3: 0)
-        case .windowFocus:
-            return nil  // Window focus events don't generate CGEvents
+        case .windowFocus, .appleScript, .appleScriptFile,
+             .conditionStart, .conditionElse, .conditionEnd,
+             .loopStart, .loopEnd, .breakLoop, .continueLoop,
+             .clickImage, .waitForImage, .dragToImage:
+            return nil  // These don't generate CGEvents
         }
 
         if let flags = flags {

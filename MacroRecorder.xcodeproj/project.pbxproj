@@ -9,6 +9,31 @@
 /* Begin PBXFileReference section */
 		001 /* MacroRecorderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRecorderApp.swift; sourceTree = "<group>"; };
 		002 /* MacroEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroEvent.swift; sourceTree = "<group>"; };
+		018 /* HotkeyConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyConfig.swift; sourceTree = "<group>"; };
+		019 /* DelayConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayConfig.swift; sourceTree = "<group>"; };
+		020 /* MacroVariable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroVariable.swift; sourceTree = "<group>"; };
+		021 /* VariableManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableManager.swift; sourceTree = "<group>"; };
+		022 /* DelayEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayEditorView.swift; sourceTree = "<group>"; };
+		023 /* VariablesPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariablesPanelView.swift; sourceTree = "<group>"; };
+		024 /* InteractiveTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveTimelineView.swift; sourceTree = "<group>"; };
+		025 /* TimelinePopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePopoverView.swift; sourceTree = "<group>"; };
+		026 /* Condition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Condition.swift; sourceTree = "<group>"; };
+		027 /* ImageTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTemplate.swift; sourceTree = "<group>"; };
+		028 /* MacroTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroTemplate.swift; sourceTree = "<group>"; };
+		029 /* CloudMacro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudMacro.swift; sourceTree = "<group>"; };
+		030 /* AppleScriptExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptExecutor.swift; sourceTree = "<group>"; };
+		031 /* ConditionEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionEvaluator.swift; sourceTree = "<group>"; };
+		032 /* ImageMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageMatcher.swift; sourceTree = "<group>"; };
+		033 /* ImageTemplateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTemplateManager.swift; sourceTree = "<group>"; };
+		034 /* CloudSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncService.swift; sourceTree = "<group>"; };
+		035 /* AppleScriptEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleScriptEditorView.swift; sourceTree = "<group>"; };
+		036 /* ExportScriptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportScriptView.swift; sourceTree = "<group>"; };
+		037 /* ConditionEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionEditorView.swift; sourceTree = "<group>"; };
+		038 /* ImageCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCaptureView.swift; sourceTree = "<group>"; };
+		039 /* ImageTemplateLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTemplateLibraryView.swift; sourceTree = "<group>"; };
+		040 /* TemplateBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateBrowserView.swift; sourceTree = "<group>"; };
+		041 /* TemplateCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateCreatorView.swift; sourceTree = "<group>"; };
+		042 /* CloudSyncSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncSettingsView.swift; sourceTree = "<group>"; };
 		003 /* EventRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRecorder.swift; sourceTree = "<group>"; };
 		004 /* EventPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventPlayer.swift; sourceTree = "<group>"; };
 		005 /* MacroSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroSession.swift; sourceTree = "<group>"; };
@@ -42,7 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				001 /* MacroRecorderApp.swift */,
-				014 /* Info.plist */,
+				015 /* Info.plist */,
 				103 /* Models */,
 				104 /* Services */,
 				105 /* Views */,
@@ -63,6 +88,13 @@
 			isa = PBXGroup;
 			children = (
 				002 /* MacroEvent.swift */,
+				018 /* HotkeyConfig.swift */,
+				019 /* DelayConfig.swift */,
+				020 /* MacroVariable.swift */,
+				026 /* Condition.swift */,
+				027 /* ImageTemplate.swift */,
+				028 /* MacroTemplate.swift */,
+				029 /* CloudMacro.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -74,6 +106,12 @@
 				004 /* EventPlayer.swift */,
 				005 /* MacroSession.swift */,
 				006 /* HotkeyManager.swift */,
+				021 /* VariableManager.swift */,
+				030 /* AppleScriptExecutor.swift */,
+				031 /* ConditionEvaluator.swift */,
+				032 /* ImageMatcher.swift */,
+				033 /* ImageTemplateManager.swift */,
+				034 /* CloudSyncService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -90,6 +128,18 @@
 				017 /* StatusOverlayView.swift */,
 				013 /* PreferencesView.swift */,
 				014 /* KeybindCaptureView.swift */,
+				022 /* DelayEditorView.swift */,
+				023 /* VariablesPanelView.swift */,
+				024 /* InteractiveTimelineView.swift */,
+				025 /* TimelinePopoverView.swift */,
+				035 /* AppleScriptEditorView.swift */,
+				036 /* ExportScriptView.swift */,
+				037 /* ConditionEditorView.swift */,
+				038 /* ImageCaptureView.swift */,
+				039 /* ImageTemplateLibraryView.swift */,
+				040 /* TemplateBrowserView.swift */,
+				041 /* TemplateCreatorView.swift */,
+				042 /* CloudSyncSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -157,6 +207,7 @@
 /* Begin PBXBuildFile section */
 		501 /* MacroRecorderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001 /* MacroRecorderApp.swift */; };
 		502 /* MacroEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 002 /* MacroEvent.swift */; };
+		515 /* HotkeyConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018 /* HotkeyConfig.swift */; };
 		503 /* EventRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003 /* EventRecorder.swift */; };
 		504 /* EventPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 004 /* EventPlayer.swift */; };
 		505 /* MacroSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005 /* MacroSession.swift */; };
@@ -169,6 +220,31 @@
 		512 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012 /* StatusBarView.swift */; };
 		514 /* StatusOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017 /* StatusOverlayView.swift */; };
 		513 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 013 /* PreferencesView.swift */; };
+		516 /* KeybindCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014 /* KeybindCaptureView.swift */; };
+		517 /* DelayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019 /* DelayConfig.swift */; };
+		518 /* MacroVariable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020 /* MacroVariable.swift */; };
+		519 /* VariableManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021 /* VariableManager.swift */; };
+		520 /* DelayEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022 /* DelayEditorView.swift */; };
+		521 /* VariablesPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023 /* VariablesPanelView.swift */; };
+		522 /* InteractiveTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024 /* InteractiveTimelineView.swift */; };
+		523 /* TimelinePopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025 /* TimelinePopoverView.swift */; };
+		524 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026 /* Condition.swift */; };
+		525 /* ImageTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027 /* ImageTemplate.swift */; };
+		526 /* MacroTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 028 /* MacroTemplate.swift */; };
+		527 /* CloudMacro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029 /* CloudMacro.swift */; };
+		528 /* AppleScriptExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 030 /* AppleScriptExecutor.swift */; };
+		529 /* ConditionEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031 /* ConditionEvaluator.swift */; };
+		530 /* ImageMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032 /* ImageMatcher.swift */; };
+		531 /* ImageTemplateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033 /* ImageTemplateManager.swift */; };
+		532 /* CloudSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034 /* CloudSyncService.swift */; };
+		533 /* AppleScriptEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035 /* AppleScriptEditorView.swift */; };
+		534 /* ExportScriptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036 /* ExportScriptView.swift */; };
+		535 /* ConditionEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037 /* ConditionEditorView.swift */; };
+		536 /* ImageCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038 /* ImageCaptureView.swift */; };
+		537 /* ImageTemplateLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039 /* ImageTemplateLibraryView.swift */; };
+		538 /* TemplateBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040 /* TemplateBrowserView.swift */; };
+		539 /* TemplateCreatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041 /* TemplateCreatorView.swift */; };
+		540 /* CloudSyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042 /* CloudSyncSettingsView.swift */; };
 		A1B2C3D4E5F602 /* WindowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F601 /* WindowDetector.swift */; };
 		A1B2C3D4E5F604 /* WindowPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F603 /* WindowPickerView.swift */; };
 		B1C2D3E4F5G602 /* CGEvent+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5G601 /* CGEvent+Extensions.swift */; };
@@ -181,6 +257,7 @@
 			files = (
 				501 /* MacroRecorderApp.swift in Sources */,
 				502 /* MacroEvent.swift in Sources */,
+				515 /* HotkeyConfig.swift in Sources */,
 				503 /* EventRecorder.swift in Sources */,
 				504 /* EventPlayer.swift in Sources */,
 				505 /* MacroSession.swift in Sources */,
@@ -193,7 +270,31 @@
 				512 /* StatusBarView.swift in Sources */,
 				514 /* StatusOverlayView.swift in Sources */,
 				513 /* PreferencesView.swift in Sources */,
-			
+				516 /* KeybindCaptureView.swift in Sources */,
+				517 /* DelayConfig.swift in Sources */,
+				518 /* MacroVariable.swift in Sources */,
+				519 /* VariableManager.swift in Sources */,
+				520 /* DelayEditorView.swift in Sources */,
+				521 /* VariablesPanelView.swift in Sources */,
+				522 /* InteractiveTimelineView.swift in Sources */,
+				523 /* TimelinePopoverView.swift in Sources */,
+				524 /* Condition.swift in Sources */,
+				525 /* ImageTemplate.swift in Sources */,
+				526 /* MacroTemplate.swift in Sources */,
+				527 /* CloudMacro.swift in Sources */,
+				528 /* AppleScriptExecutor.swift in Sources */,
+				529 /* ConditionEvaluator.swift in Sources */,
+				530 /* ImageMatcher.swift in Sources */,
+				531 /* ImageTemplateManager.swift in Sources */,
+				532 /* CloudSyncService.swift in Sources */,
+				533 /* AppleScriptEditorView.swift in Sources */,
+				534 /* ExportScriptView.swift in Sources */,
+				535 /* ConditionEditorView.swift in Sources */,
+				536 /* ImageCaptureView.swift in Sources */,
+				537 /* ImageTemplateLibraryView.swift in Sources */,
+				538 /* TemplateBrowserView.swift in Sources */,
+				539 /* TemplateCreatorView.swift in Sources */,
+				540 /* CloudSyncSettingsView.swift in Sources */,
 				A1B2C3D4E5F602 /* WindowDetector.swift in Sources */,
 				A1B2C3D4E5F604 /* WindowPickerView.swift in Sources */,
 				B1C2D3E4F5G602 /* CGEvent+Extensions.swift in Sources */,);
@@ -289,7 +390,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -363,7 +464,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macrorecorder.app;

@@ -27,6 +27,7 @@ class EventPlayer: ObservableObject {
     private var playbackTask: Task<Void, Never>?
     private var events: [MacroEvent] = []
     private let windowDetector = WindowDetector.shared
+    private let variableManager = VariableManager.shared
 
     func play(events: [MacroEvent], mode: PlaybackMode = .once, speed: Double = 1.0) {
         guard !isPlaying, !events.isEmpty else { return }
@@ -93,8 +94,16 @@ class EventPlayer: ObservableObject {
             }
 
             // Wait for the delay (adjusted by playback speed)
-            if event.delay > 0 {
-                let adjustedDelay = event.delay / playbackSpeed
+            // Use delayConfig for variable/random delays, fallback to fixed delay
+            let resolvedDelay: TimeInterval
+            if let config = event.delayConfig {
+                resolvedDelay = variableManager.resolveDelay(config)
+            } else {
+                resolvedDelay = event.delay
+            }
+
+            if resolvedDelay > 0 {
+                let adjustedDelay = resolvedDelay / playbackSpeed
                 try? await Task.sleep(nanoseconds: UInt64(adjustedDelay * 1_000_000_000))
             }
 

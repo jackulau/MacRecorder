@@ -113,28 +113,7 @@ struct EventEditorView: View {
     }
 
     private var eventTypeName: String {
-        switch event.type {
-        case .mouseLeftDown:
-            return "Left Mouse Down"
-        case .mouseLeftUp:
-            return "Left Mouse Up"
-        case .mouseRightDown:
-            return "Right Mouse Down"
-        case .mouseRightUp:
-            return "Right Mouse Up"
-        case .mouseMove:
-            return "Mouse Move"
-        case .mouseDrag:
-            return "Mouse Drag"
-        case .keyDown:
-            return "Key Down"
-        case .keyUp:
-            return "Key Up"
-        case .scroll:
-            return "Scroll"
-        case .windowFocus:
-            return "Window Focus"
-        }
+        return event.type.displayName
     }
 
     private func saveChanges() {
@@ -454,6 +433,30 @@ struct EventCreatorView: View {
             return "Scroll the mouse wheel"
         case .windowFocus:
             return "Focus a specific window"
+        case .appleScript:
+            return "Execute inline AppleScript code"
+        case .appleScriptFile:
+            return "Execute AppleScript from a file"
+        case .conditionStart:
+            return "Start a conditional block (if)"
+        case .conditionElse:
+            return "Else branch of conditional"
+        case .conditionEnd:
+            return "End of conditional block"
+        case .loopStart:
+            return "Start a loop"
+        case .loopEnd:
+            return "End of loop"
+        case .breakLoop:
+            return "Break out of the current loop"
+        case .continueLoop:
+            return "Skip to next loop iteration"
+        case .clickImage:
+            return "Click on a found image"
+        case .waitForImage:
+            return "Wait for an image to appear"
+        case .dragToImage:
+            return "Drag to a found image location"
         }
     }
 

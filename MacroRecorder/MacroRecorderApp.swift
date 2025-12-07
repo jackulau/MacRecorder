@@ -89,5 +89,5 @@ extension Notification.Name {
     static let toggleRecording = Notification.Name("toggleRecording")
     static let togglePlayback = Notification.Name("togglePlayback")
     static let saveMacro = Notification.Name("saveMacro")
-    static let hotkeysChanged = Notification.Name("hotkeysChanged")
+    // hotkeysChanged is defined in HotkeyConfig.swift
 }
